@@ -1,3 +1,7 @@
+# Project specific stuff
+secret.py
+.idea/
+*.png
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
