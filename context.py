@@ -1,8 +1,8 @@
 from enum import Enum
+from datetime import datetime
 import response
 import league
-import asyncio
-
+import parse_data
 
 class Context(Enum):
     base = 0
@@ -15,6 +15,17 @@ class Context(Enum):
 class ContextManager:
     def __init__(self):
         self.user_contexts = {}
+        self.games = {}
+
+    def add_game(self, game_id):
+        self.games[game_id] = datetime.now()
+
+    def purge_games(self):
+        now = datetime.now()
+        for game_time in self.games.values():
+            time_delta = now - game_time
+            if time_delta.days > 0:
+                del self.games[game_time]
 
     async def update_context(self, user_id, message):
         print(f"{user_id=}")
@@ -61,7 +72,8 @@ class UserContext:
                     if game_data is None:
                         await response.game_not_found(message)
                     else:
-                        await response.game_data(message, game_data)
+                        stats = await parse_data.parse_game_data(game_data, self.summoner_id)
+                        await response.game_data(message, stats)
             else:
                 self.context = Context.register_prompt
                 await response.register_prompt(message)

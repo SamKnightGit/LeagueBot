@@ -11,6 +11,7 @@ async def game_not_found(message):
 
 async def game_data(message, game_data):
     await message.channel.send("Found the current game: ")
+    await message.channel.send(game_data)
 
 
 async def league_ign_prompt(message):

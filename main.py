@@ -2,10 +2,14 @@ import time
 import discord
 import context
 import secret
+import asyncio
+import league
+import parse_data
+
+STATS_CHANNEL_INDEX = 651818196751482880
 client = discord.Client()
 time_between_game_searches = 10
 context_manager = context.ContextManager()
-
 """
 Listens for any discord message sent to the bot:
     1)
@@ -37,7 +41,8 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    await context_manager.update_context(message.author.id, message)
+    if message.channel.type == discord.ChannelType.private:
+        await context_manager.update_context(message.author.id, message)
 
 """
     Loop over all registered users:
@@ -46,11 +51,28 @@ async def on_message(message):
             Add game ID to list
             Send opponent information to slack channel
 """
-def search_for_games():
-    pass
+async def search_for_games():
+    while True:
+        print("Searching for games")
+        for user_id, user_context in context_manager.user_contexts.items():
+            if user_context.is_registered:
+                game_data = league.get_current_game(user_context.summoner_id)
+                if game_data is None or game_data['gameId'] in context_manager.games.keys():
+                    continue
+                context_manager.add_game(game_data['gameId'])
+                stats_channel = client.get_channel(STATS_CHANNEL_INDEX)
+                stats = await parse_data.parse_game_data(game_data, user_context.summoner_id)
+                print(stats)
+                await stats_channel.send(stats)
+
+        await asyncio.sleep(time_between_game_searches)
 
 
+async def purge_games():
+    while True:
+        context_manager.purge_games()
+        await asyncio.sleep(3600 * 24)
+
+client.loop.create_task(purge_games())
+client.loop.create_task(search_for_games())
 client.run(secret.DISCORD_BOT_TOKEN)
-# while True:
-#     search_for_games()
-#     time.sleep(time_between_game_searches)
