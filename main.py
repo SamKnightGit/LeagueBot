@@ -8,7 +8,7 @@ import parse_data
 
 STATS_CHANNEL_INDEX = 651818196751482880
 client = discord.Client()
-time_between_game_searches = 10
+seconds_between_game_searches = 10
 context_manager = context.ContextManager()
 """
 Listens for any discord message sent to the bot:
@@ -49,7 +49,7 @@ async def on_message(message):
     If user is in game:
         AND game has not already been added to list
             Add game ID to list
-            Send opponent information to slack channel
+            Send opponent information to Discord channel
 """
 async def search_for_games():
     while True:
@@ -65,7 +65,7 @@ async def search_for_games():
                 print(stats)
                 await stats_channel.send(stats)
 
-        await asyncio.sleep(time_between_game_searches)
+        await asyncio.sleep(seconds_between_game_searches)
 
 
 async def purge_games():

@@ -28,8 +28,6 @@ class ContextManager:
                 del self.games[game_time]
 
     async def update_context(self, user_id, message):
-        print(f"{user_id=}")
-        print(f"{self.user_contexts=}")
         if context := self.user_contexts.get(user_id, None):
             await context.update(message)
         else:

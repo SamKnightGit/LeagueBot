@@ -88,7 +88,3 @@ def get_current_game(summoner_id):
     else:
         print(request_data.json())
         return request_data.json()
-
-# get_summoner_by_name("knightterror")
-# get_summoner_data("1yGh5GVYYxzNzrgCgcqigfs7eFk0lNDBoBuVRqDnH1LQy9U")
-get_champion_dict()
